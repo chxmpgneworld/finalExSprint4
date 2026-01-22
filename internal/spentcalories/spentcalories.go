@@ -19,14 +19,13 @@ const (
 )
 
 var (
-	ErrParameterZero = errors.New("the parameter is equal to zero")
-	ErrNoString      = errors.New("empty string")
-	ErrUnknownType   = errors.New("неизвестный тип тренировки")
-	ErrSliceLen      = errors.New("invalid slice length")
-	ErrSteps         = errors.New("wrong number of steps")
-	ErrTime          = errors.New("zero or negative time value")
-	ErrWeight        = errors.New("wrong weight")
-	ErrHeight        = errors.New("wrong height")
+	ErrNoString    = errors.New("empty string")
+	ErrUnknownType = errors.New("неизвестный тип тренировки")
+	ErrSliceLen    = errors.New("invalid slice length")
+	ErrSteps       = errors.New("wrong number of steps")
+	ErrTime        = errors.New("zero or negative time value")
+	ErrWeight      = errors.New("wrong weight")
+	ErrHeight      = errors.New("wrong height")
 )
 
 func parseTraining(data string) (int, string, time.Duration, error) {
@@ -78,13 +77,17 @@ func TrainingInfo(data string, weight, height float64) (string, error) {
 		log.Println(ErrNoString)
 		return "", ErrNoString
 	}
-	if (weight <= 0) || (height <= 0) {
-		log.Println(ErrParameterZero)
-		return "", ErrParameterZero
+	if weight <= 0 {
+		log.Println(ErrWeight)
+		return "", ErrWeight
+	}
+	if height <= 0 {
+		log.Println(ErrHeight)
+		return "", ErrHeight
 	}
 	steps, activityType, duration, err := parseTraining(data)
 	if err != nil {
-		log.Println(err, "ошибка парсинга")
+		log.Println(err)
 		return "", err
 	}
 
@@ -136,8 +139,17 @@ func RunningSpentCalories(steps int, weight, height float64, duration time.Durat
 
 func WalkingSpentCalories(steps int, weight, height float64, duration time.Duration) (float64, error) {
 	// TODO: реализовать функцию
-	if (steps <= 0) || (weight <= 0) || (height <= 0) || (duration <= 0) {
-		return 0, ErrParameterZero
+	if steps <= 0 {
+		return 0, ErrSteps
+	}
+	if weight <= 0 {
+		return 0, ErrWeight
+	}
+	if height <= 0 {
+		return 0, ErrHeight
+	}
+	if duration <= 0 {
+		return 0, ErrTime
 	}
 	avgSpeed := meanSpeed(steps, height, duration)
 	minutes := duration.Minutes()
