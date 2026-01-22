@@ -19,12 +19,14 @@ const (
 )
 
 var (
-	ErrParameterZero = errors.New("ошибка. переданный параметр равняется нулю")
-	ErrNoString      = errors.New("ошибка. пустая строка")
-	ErrUnknownType   = errors.New("ошибка. неизвестный тип тренировки")
-	ErrSliceLen      = errors.New("ошибка длины полученного слайса")
-	ErrSteps         = errors.New("ошибка количества шагов")
-	ErrTime          = errors.New("ошибка. нулевое или отрицательно время")
+	ErrParameterZero = errors.New("the parameter is equal to zero")
+	ErrNoString      = errors.New("empty string")
+	ErrUnknownType   = errors.New("неизвестный тип тренировки")
+	ErrSliceLen      = errors.New("invalid slice length")
+	ErrSteps         = errors.New("wrong number of steps")
+	ErrTime          = errors.New("zero or negative time value")
+	ErrWeight        = errors.New("wrong weight")
+	ErrHeight        = errors.New("wrong height")
 )
 
 func parseTraining(data string) (int, string, time.Duration, error) {
@@ -86,8 +88,8 @@ func TrainingInfo(data string, weight, height float64) (string, error) {
 		return "", err
 	}
 
-	switch {
-	case activityType == "Бег":
+	switch activityType {
+	case "Бег":
 		dist := distance(steps, height)
 		avgSpeed := meanSpeed(steps, height, duration)
 		calories, err := RunningSpentCalories(steps, weight, height, duration)
@@ -97,7 +99,7 @@ func TrainingInfo(data string, weight, height float64) (string, error) {
 		}
 		str := fmt.Sprintf("Тип тренировки: %s\nДлительность: %0.2f ч.\nДистанция: %0.2f км.\nСкорость: %0.2f км/ч\nСожгли калорий: %0.2f\n", activityType, duration.Hours(), dist, avgSpeed, calories)
 		return str, nil
-	case activityType == "Ходьба":
+	case "Ходьба":
 		dist := distance(steps, height)
 		avgSpeed := meanSpeed(steps, height, duration)
 		calories, err := WalkingSpentCalories(steps, weight, height, duration)
@@ -115,8 +117,17 @@ func TrainingInfo(data string, weight, height float64) (string, error) {
 
 func RunningSpentCalories(steps int, weight, height float64, duration time.Duration) (float64, error) {
 	// TODO: реализовать функцию
-	if (steps <= 0) || (weight <= 0) || (height <= 0) || (duration <= 0) {
-		return 0, ErrParameterZero
+	if steps <= 0 {
+		return 0, ErrSteps
+	}
+	if weight <= 0 {
+		return 0, ErrWeight
+	}
+	if height <= 0 {
+		return 0, ErrHeight
+	}
+	if duration <= 0 {
+		return 0, ErrTime
 	}
 	avgSpeed := meanSpeed(steps, height, duration)
 	minutes := duration.Minutes()
