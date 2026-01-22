@@ -24,6 +24,7 @@ var (
 	ErrUnknownType   = errors.New("ошибка. неизвестный тип тренировки")
 	ErrSliceLen      = errors.New("ошибка длины полученного слайса")
 	ErrSteps         = errors.New("ошибка количества шагов")
+	ErrTime          = errors.New("ошибка. нулевое или отрицательно время")
 )
 
 func parseTraining(data string) (int, string, time.Duration, error) {
@@ -37,12 +38,15 @@ func parseTraining(data string) (int, string, time.Duration, error) {
 		if err != nil {
 			return 0, "", 0, err
 		}
-		if steps == 0 {
+		if steps <= 0 {
 			return 0, "", 0, ErrSteps
 		}
 		time, err := time.ParseDuration(parts[2])
 		if err != nil {
 			return 0, "", 0, err
+		}
+		if time <= 0 {
+			return 0, "", 0, ErrTime
 		}
 		return steps, parts[1], time, nil
 	}
@@ -81,6 +85,7 @@ func TrainingInfo(data string, weight, height float64) (string, error) {
 		log.Println(err, "ошибка парсинга")
 		return "", err
 	}
+
 	switch {
 	case activityType == "Бег":
 		dist := distance(steps, height)
